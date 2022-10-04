@@ -1,0 +1,24 @@
+services:
+  nginx:
+    build: requirements/nginx
+    ports: 
+      - 8080:8080
+  mariadb:
+    build:  requirements/mariadb
+    volumes:
+      -
+    restart:  always
+    environment:
+      - name=value
+  wordpress:
+    build: requirements/wordpress
+    depends_on:
+      - mariadb
+    ports:
+      - 8080:8080
+    restart: always
+    environment:
+      - name=value
+    volumes:
+      - ./wp-content:/var/www/html/wp-content
+volumes:
