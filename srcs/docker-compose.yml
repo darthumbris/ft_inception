@@ -6,6 +6,8 @@ services:
     depends_on:
       - wordpress
     build: requirements/nginx
+    env_file:
+      - .env
     ports: 
       - 443:443
     restart: always
@@ -61,3 +63,12 @@ volumes:
 networks:
   inception: #network name
     driver: bridge #network type
+
+
+# commands to run this docker-compose
+# sudo docker-compose -f srcs/docker-compose.yml build
+# sudo docker-compose -f srcs/docker-compose.yml up -d
+
+# sudo docker-compose -f srcs/docker-compose.yml down
+
+# sudo docker-compose -f srcs/docker-compose.yml ps
