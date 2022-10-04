@@ -50,13 +50,13 @@ volumes:
   driver_opts:
    o: bind #binding the volume
    type: ext4 #setting the type of volume
-   device: /home/shoogenb/data/wordpress #setting the directory of volume
+   device: /Users/shoogenb/data/wordpress #setting the directory of volume
  mariadb:
   driver: local #volume is located locally
   driver_opts:
     o: bind #binding the volume
     type: ext4 #setting the type of volume
-    device: /home/shoogenb/data/mariadb #setting the directory of volume
+    device: /Users/shoogenb/data/mariadb #setting the directory of volume
 
 #https://docs.docker.com/network/
 # network for the containers

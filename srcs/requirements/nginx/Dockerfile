@@ -7,8 +7,8 @@ RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y vim curl openssl nginx net-tools
 
 # making a new ssl key
-RUN openssl req -x509 -new -newkey rsa:2048 -nodes \
-    -addext "subjectAltName=DNS:${DOMAIN_NAME}" \
+RUN openssl req -x509 -newkey rsa:2048 -nodes \
+    # -addext "subjectAltName=DNS:${DOMAIN_NAME}" \
     -out /etc/ssl/certs/nginx_server.csr \
     -keyout /etc/ssl/private/nginx_server.key -subj "/C=/ST=/L=/O=/CN=${DOMAIN_NAME}"
 
