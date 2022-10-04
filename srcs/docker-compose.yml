@@ -1,24 +1,63 @@
+version: '3'
+# All the containers being used they use the .env file for variables
 services:
+
   nginx:
+    depends_on:
+      - wordpress
     build: requirements/nginx
     ports: 
-      - 8080:8080
+      - 443:443
+    restart: always
+    volumes:
+      - wordpress:/var/www/html
+    networks:
+      - inception
+
   mariadb:
     build:  requirements/mariadb
+    env_file:
+      - .env
     volumes:
-      -
+      - mariadb:/var/lib/mysql/
+    ports:
+      - 3306:3306
     restart:  always
-    environment:
-      - name=value
+    networks:
+      - inception
+
   wordpress:
-    build: requirements/wordpress
     depends_on:
       - mariadb
+    build: requirements/wordpress
+    env_file:
+      - .env
     ports:
-      - 8080:8080
+      - 9000:9000
     restart: always
-    environment:
-      - name=value
     volumes:
-      - ./wp-content:/var/www/html/wp-content
+      - wordpress:/var/www/html
+    networks:
+      - inception
+
+#https://docs.docker.com/storage/volumes/
+# volumes for the containers
 volumes:
+ wordpress:
+  driver: local #volume is located locally
+  driver_opts:
+   o: bind #binding the volume
+   type: ext4 #setting the type of volume
+   device: /home/shoogenb/data/wordpress #setting the directory of volume
+ mariadb:
+  driver: local #volume is located locally
+  driver_opts:
+    o: bind #binding the volume
+    type: ext4 #setting the type of volume
+    device: /home/shoogenb/data/mariadb #setting the directory of volume
+
+#https://docs.docker.com/network/
+# network for the containers
+networks:
+  inception: #network name
+    driver: bridge #network type
