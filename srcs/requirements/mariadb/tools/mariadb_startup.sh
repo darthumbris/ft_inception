@@ -1,18 +1,20 @@
+#!/bin/sh
 
-#putting the user and password from the .env into the config
-sed -i -e "s/\${DB_USER}/${MYSQL_USER}/g" ./conf/mariadb.conf;
-sed -i -e "s/\${DB_PASSWORD}/${MYSQL_PASSWORD}/g" ./conf/mariadb.conf;
-
-#starting up the mysql service
 service mysql start;
 
-#creating user and naming database and grantinc access to user
-echo "CREATING USER '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';";
-echo "CREATING DATABASE ${MYSQL_NAME};";
-echo "GRANT ALL PRIVILEGES ON *.* TO '${MYSQL_USER}'@'%' WITH GRANT OPTION;";
-echo "FLUSH PRIVILEGES;";
-
-#stopping the mysql service
-service mysql stop;
-#starting the mysql database
+# checking if the mysql is already built if not it will built it
+mysqlshow | grep $DB_NAME ||
+#putting the user and password from the .env into the config
+sed -i 's/username_here/'$DB_USER'/g' initial_db.sql && \
+sed -i 's/password_here/'$DB_PASSWORD'/g' initial_db.sql && \
+sed -i 's/root_pw_here/'$DB_ROOT_PASSWORD'/g' initial_db.sql && \
+sed -i 's/database_here/'$DB_NAME'/g' initial_db.sql && \
+#setting the addresses and other settings for the config
+sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mysql/mariadb.conf.d/50-server.cnf && \
+sed 's/bind-address            = 127.0.0.1/bind-address            = 0.0.0.0/' -i  /etc/mysql/mariadb.conf.d/50-server.cnf && \
+sed 's/skip-networking/#skip-networking/g' -i  /etc/mysql/mariadb.conf.d/50-server.cnf && \
+#starting the mysql and giving it the initial_db as input
+mysql < initial_db.sql
+# rm -f initial_db.sql;
+mysqladmin -u root -p${DB_ROOT_PASSWORD} shutdown;
 mysqld;

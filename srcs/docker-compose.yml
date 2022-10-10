@@ -1,62 +1,20 @@
-version: '3'
-# All the containers being used they use the .env file for variables
-services:
-
-  nginx:
-    depends_on:
-      - wordpress
-    build: requirements/nginx
-    env_file:
-      - .env
-    ports: 
-      - 443:443
-    restart: always
-    volumes:
-      - wordpress:/var/www/html
-    networks:
-      - inception
-
-  mariadb:
-    build:  requirements/mariadb
-    env_file:
-      - .env
-    volumes:
-      - mariadb:/var/lib/mysql/
-    ports:
-      - 3306:3306
-    restart:  always
-    networks:
-      - inception
-
-  wordpress:
-    depends_on:
-      - mariadb
-    build: requirements/wordpress
-    env_file:
-      - .env
-    ports:
-      - 9000:9000
-    restart: always
-    volumes:
-      - wordpress:/var/www/html
-    networks:
-      - inception
+# version: '3'
 
 #https://docs.docker.com/storage/volumes/
 # volumes for the containers
 volumes:
- wordpress:
+ wp_volume:
   driver: local #volume is located locally
   driver_opts:
    o: bind #binding the volume
-   type: ext4 #setting the type of volume
+   type: none #setting the type of volume
    device: /Users/shoogenb/data/wordpress #setting the directory of volume
- mariadb:
+ db_volume:
   driver: local #volume is located locally
   driver_opts:
     o: bind #binding the volume
-    type: ext4 #setting the type of volume
-    device: /Users/shoogenb/data/mariadb #setting the directory of volume
+    type: none #setting the type of volume
+    device: /Users/shoogenb/data/db #setting the directory of volume
 
 #https://docs.docker.com/network/
 # network for the containers
@@ -64,11 +22,44 @@ networks:
   inception: #network name
     driver: bridge #network type
 
+# All the containers being used they use the .env file for variables
+services:
 
-# commands to run this docker-compose
-# sudo docker-compose -f srcs/docker-compose.yml build
-# sudo docker-compose -f srcs/docker-compose.yml up -d
+  mariadb:
+    container_name: mariadb
+    build:  requirements/mariadb
+    env_file:
+      - .env
+    volumes:
+      - db_volume:/var/lib/mysql/
+    restart:  always
+    networks:
+      - inception
 
-# sudo docker-compose -f srcs/docker-compose.yml down
+  wordpress:
+    container_name: wordpress
+    depends_on:
+      - mariadb
+    build: requirements/wordpress
+    env_file:
+      - .env
+    restart: always
+    volumes:
+      - wp_volume:/var/www/html
+    networks:
+      - inception
 
-# sudo docker-compose -f srcs/docker-compose.yml ps
+  nginx:
+    container_name: nginx
+    depends_on:
+      - wordpress
+    build: requirements/nginx
+    env_file:
+      - .env
+    ports: 
+      - "443:443"
+    restart: always
+    volumes:
+      - wp_volume:/var/www/html
+    networks:
+      - inception

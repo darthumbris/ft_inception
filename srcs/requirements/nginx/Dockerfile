@@ -4,16 +4,23 @@ FROM debian:buster
 RUN apt-get update && apt-get upgrade -y
 
 #install nginx and other usefull applications
-RUN apt-get install -y vim curl openssl nginx net-tools
+RUN apt-get install -y openssl nginx
+
+#making a dir for storing the ssl keys and cert
+RUN mkdir -p /var/ssl
 
 # making a new ssl key
 RUN openssl req -x509 -newkey rsa:2048 -nodes \
-    # -addext "subjectAltName=DNS:${DOMAIN_NAME}" \
-    -out /etc/ssl/certs/nginx_server.csr \
-    -keyout /etc/ssl/private/nginx_server.key -subj "/C=/ST=/L=/O=/CN=${DOMAIN_NAME}"
+    -out /var/ssl/nginx_server.crt \
+    -keyout /var/ssl/nginx_server.key -subj "/C=/ST=/L=/O=/CN=${DOMAIN_NAME}"
+
+#removing the default config
+RUN rm -f /etc/nginx/sites-available/default && rm -f /etc/nginx/sites-enabled/default
 
 #copy the config for nginx from the local directory to the directory in the image
 COPY conf/default.conf /etc/nginx/sites-available/nginx.conf
+
+RUN ln -s /etc/nginx/sites-available/nginx.conf /etc/nginx/sites-enabled/nginx.conf
 
 #exposing port 443 for the nginx server
 EXPOSE 443
