@@ -1,5 +1,7 @@
 FROM debian:buster
 
+ARG DOMAIN_NAME
+
 #-y flag for assume yes to update and upgrade stuff
 RUN apt-get update && apt-get upgrade -y
 
