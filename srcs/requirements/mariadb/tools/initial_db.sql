@@ -1,4 +1,4 @@
-CREATE DATABASE IF NOT EXISTS wordpress;
+CREATE DATABASE IF NOT EXISTS database_here;
 CREATE USER IF NOT EXISTS 'username_here'@'%' IDENTIFIED BY 'password_here';
 GRANT ALL PRIVILEGES ON database_here.* TO 'username_here'@'%';
 FLUSH PRIVILEGES;
